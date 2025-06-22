@@ -17,7 +17,7 @@ class OpenAIService {
         
         var request = URLRequest(url: URL(string: endpoint)!)
         request.httpMethod = "POST"
-        request.allHTTPHeaderFields = ["Authorization": "Bearer \(Constants.apiKey)",
+        request.allHTTPHeaderFields = ["Authorization": "Bearer \(Secrets.apiKey)",
                                        "Content-Type": "application/json"]
         request.httpBody = try JSONEncoder().encode(openAIBody)
         let (data, response) = try await URLSession.shared.data(for: request)
