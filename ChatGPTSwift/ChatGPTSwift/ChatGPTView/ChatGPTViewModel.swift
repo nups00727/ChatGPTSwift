@@ -4,16 +4,18 @@
 //
 //  Created by Nupur Sharma on 25/06/25.
 //
+import Foundation
+import OpenAI
 
 class ChatGPTViewModel {
-    let chatID: String
+    var chat: AppChat!
     
-    init(chatID: String) {
-        self.chatID = chatID
-    }
 }
 
 struct AppMessage: Identifiable, Hashable, Codable {
-    let id: String
+    let id: String?
+    var text: String
+    var role: SenderRole
+    var createdAt: Date
     
 }

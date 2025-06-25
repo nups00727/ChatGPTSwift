@@ -10,7 +10,7 @@ import SwiftUI
 struct AuthView: View {
     
    @State var viewModel = AuthViewModel()
-    @Environment(AppState.self) private var appState: AppState
+   @Environment(AppState.self) private var appState: AppState
     
     var body: some View {
         VStack {

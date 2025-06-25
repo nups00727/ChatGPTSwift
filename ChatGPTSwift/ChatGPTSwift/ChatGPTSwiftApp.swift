@@ -10,7 +10,7 @@ import SwiftData
 
 @main
 struct ChatGPTSwiftApp: App {
-    var appState = AppState()
+   @Bindable var appState = AppState()
 //    var sharedModelContainer: ModelContainer = {
 //        let schema = Schema([
 //            Message.self,
@@ -27,7 +27,10 @@ struct ChatGPTSwiftApp: App {
     var body: some Scene {
         WindowGroup {
             if appState.isLoggedIn {
-                ChatListView()
+                NavigationStack(path: $appState.navigationPath) {
+                    ChatListView()
+                        .environment(appState)
+                }
             } else {
                 AuthView()
                     .environment(appState)

@@ -10,6 +10,7 @@ import SwiftUI
 struct ChatListView: View {
     
     @State var viewModel = ChatListViewModel()
+    @Environment(AppState.self) private var appState: AppState
     
     var body: some View {
         Group {
@@ -28,22 +29,35 @@ struct ChatListView: View {
         .toolbar(content: {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    //Todo
+                    viewModel.showProfile()
                 } label: {
                     Image(systemName: "person.crop.circle.fill")
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    //todo
+                    Task {
+                        do {
+                           let chatId = try await viewModel.createChat(user: appState.currentUser?.uid)
+                            appState.navigationPath.append(chatId)
+                        } catch {
+                            print(error)
+                        }
+                    }
                 } label: {
                     Image(systemName: "square.and.pencil")
                 }
             }
         })
+        .sheet(isPresented: $viewModel.isShowingProfileView, content: {
+            ProfileView()
+        })
+        .navigationDestination(for: String.self, destination: { chatId in
+            ChatView(viewModel: .init(chatID: chatId))
+        })
         .onAppear {
             if viewModel.loadingState == .none {
-                viewModel.fetchChats()
+                viewModel.fetchChats(user: appState.currentUser?.uid)
             }
         }
     }
@@ -76,6 +90,14 @@ struct ChatListChildView: View {
                     Text(chat.lastMessageTimeAgo)
                         .font(.caption)
                         .foregroundStyle(.gray)
+                }
+            }
+            .swipeActions(edge: .trailing) {
+                Button(role:.destructive) {
+                    //todo
+                    viewModel.deleteChat(chat: chat)
+                } label: {
+                    Label("Delete", image: "trash.fill")
                 }
             }
         }

@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import OpenAI
+import FirebaseFirestore
 
-struct Message: Codable {
-    let timestamp: Date
-    let id: UUID
+struct Message: Codable, Hashable, Identifiable {
+    var createdAt: FireStoreDate = FireStoreDate()
+    @DocumentID var id: String?
     let content: String
     let role: SenderRole
 }
