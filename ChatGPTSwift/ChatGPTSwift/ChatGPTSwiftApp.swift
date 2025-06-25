@@ -10,6 +10,7 @@ import SwiftData
 
 @main
 struct ChatGPTSwiftApp: App {
+    var appState = AppState()
 //    var sharedModelContainer: ModelContainer = {
 //        let schema = Schema([
 //            Message.self,
@@ -25,7 +26,12 @@ struct ChatGPTSwiftApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ChatView()
+            if appState.isLoggedIn {
+                ChatListView()
+            } else {
+                AuthView()
+                    .environment(appState)
+            }
         }
        // .modelContainer(sharedModelContainer)
     }

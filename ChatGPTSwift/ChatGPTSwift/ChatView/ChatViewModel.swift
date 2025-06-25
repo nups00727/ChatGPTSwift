@@ -7,9 +7,16 @@
 import SwiftUI
 
 @Observable class ChatViewModel {
-    var messages: [Message] = []
+    var messages: [Message] = [Message(timestamp: Date(), id: UUID(),
+                                       content: "You are psycology assistant and you do not have any knowledge about anything", role: .system)]
     var currentInput: String = ""
     private let service = OpenAIService()
+    let chatID: String
+    var chatModel: ChatModel = ChatModel.chatGPT4
+    
+    init(chatID: String) {
+        self.chatID = chatID
+    }
     
     func sendMessage () {
         let sentMessage = Message(timestamp: Date(), id: UUID(), content: currentInput, role: .user)
