@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseFirestore
+import OpenAI
 
 @Observable class ChatListViewModel {
     
@@ -16,11 +17,6 @@ import FirebaseFirestore
     private let db = Firestore.firestore()
     
     func fetchChats(user: String?) {
-//        chats = [
-//            AppChat(id: "1", topic: "test", model: .chatGPT4, lastMessageSentAt: Date(), owner: "123"),
-//            AppChat(id: "2", topic: "test 1", model: .chatGPT40, lastMessageSentAt: Date(), owner: "123")
-//        ]
-//        loadingState = .resultFound
         
         if loadingState == .none {
             loadingState = .loading
@@ -51,6 +47,9 @@ import FirebaseFirestore
     }
     
     func deleteChat(chat: AppChat) {
+        guard let id = chat.id else { return }
+        
+        db.collection("chats").document(id).delete()
         
     }
 }
@@ -65,7 +64,7 @@ enum ChatListState {
 struct AppChat: Codable {
     @DocumentID var id: String?
     let topic: String?
-    let model: ChatModel?
+    var model: ChatModel?
     let lastMessageSentAt: FireStoreDate
     let owner: String
     
@@ -101,6 +100,15 @@ enum ChatModel: String, Codable, CaseIterable, Hashable {
             return .green
         case .chatGPT4:
             return .purple
+        }
+    }
+    
+    var model: Model {
+        switch self {
+        case .chatGPT40:
+            return .gpt4_o
+        case .chatGPT4:
+            return .gpt4_1
         }
     }
 }

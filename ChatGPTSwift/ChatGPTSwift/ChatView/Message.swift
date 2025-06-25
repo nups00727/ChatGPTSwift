@@ -12,8 +12,8 @@ import FirebaseFirestore
 struct Message: Codable, Hashable, Identifiable {
     var createdAt: FireStoreDate = FireStoreDate()
     @DocumentID var id: String?
-    let content: String
-    let role: SenderRole
+    var content: String
+    let role: ChatQuery.ChatCompletionMessageParam.Role
 }
 
 struct OpenAIChatBody: Codable {
@@ -22,13 +22,13 @@ struct OpenAIChatBody: Codable {
 }
 
 struct OpenAIChatmessage: Codable {
-    let role: SenderRole
+    let role: ChatQuery.ChatCompletionMessageParam.Role
     let content: String
 }
 
-enum SenderRole: String, Codable {
-    //case developer
-    case user
-    case assistant
-    case system
-}
+//enum SenderRole: String, Codable {
+//    //case developer
+//    case user
+//    case assistant
+//    case system
+//}

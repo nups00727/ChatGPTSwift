@@ -85,11 +85,11 @@ struct ChatView: View {
             .background(Color.gray.opacity(0.1))
             .cornerRadius(12)
             .onSubmit {
-                viewModel.sendMessage()
+                sendMessage()
             }
             
             Button(action: {
-                viewModel.sendMessage()
+                sendMessage()
             }) {
                 Text("Send")
                     .foregroundStyle(Color.white)
@@ -99,6 +99,16 @@ struct ChatView: View {
             }
         }
         .padding()
+    }
+    
+    private func sendMessage() {
+        Task {
+            do {
+                try await viewModel.sendMessage()
+            } catch {
+                print(error)
+            }
+        }
     }
  
 }

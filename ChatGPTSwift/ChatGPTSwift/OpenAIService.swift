@@ -20,7 +20,7 @@ class OpenAIService {
         request.allHTTPHeaderFields = ["Authorization": "Bearer \(Secrets.apiKey)",
                                        "Content-Type": "application/json"]
         request.httpBody = try JSONEncoder().encode(openAIBody)
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, _) = try await URLSession.shared.data(for: request)
         return try JSONDecoder().decode(OpenAIChatResponse.self, from: data)
     }
 }
