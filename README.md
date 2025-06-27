@@ -1,7 +1,7 @@
 # Chat GPT App in Swift
 ChatGPT App which lets the user select the gpt model from gpt-40 and gpt-4.1. <br/>
 User will have the list of his personal chats.
-When the user initiates the conversation, the gpt model is selected at first and the chat continues with that model.
+When the user initiates the conversation, the gpt model is selected at first and the chat continues with that model.  <br/>
 
 <br>
 <br>
