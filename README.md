@@ -1,5 +1,5 @@
 # Chat GPT App in Swift
-ChatGPT App which lets the user select the gpt model from gpt-40 and gpt-4.1.
+ChatGPT App which lets the user select the gpt model from gpt-40 and gpt-4.1. <br/>
 User will have the list of his personal chats.
 
 <br>
