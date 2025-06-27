@@ -1,5 +1,5 @@
 # Chat GPT App in Swift
-ChatGPT App which lets the user select the gpt model from gpt-40 and gpt-4.1. <br/>
+ChatGPT App is a basic app with chatGPT integrated. It lets the user select the gpt model from gpt-40 and gpt-4.1. <br/>
 User will have the list of his personal chats.  <br/>
 When the user initiates the conversation, the gpt model is selected at first and the chat continues with that model. 
 
