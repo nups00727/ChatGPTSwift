@@ -13,8 +13,6 @@ struct ChatListView: View {
     @Environment(AppState.self) private var appState: AppState
     @State var topic: String = ""
     @State var showingAlert: Bool = false
-    @State var submit: () -> Void = {}
-    
     
     var body: some View {
         Group {
@@ -40,6 +38,7 @@ struct ChatListView: View {
                 }
                 .alert("", isPresented: $showingAlert) {
                     TextField("Enter your topic of chat", text: $topic)
+                    Button("Cancel", role: .cancel, action: {})
                     Button("Create Chat", action: {
                         showingAlert = false
                         Task {
@@ -52,6 +51,7 @@ struct ChatListView: View {
                             }
                         }
                     })
+                   
                 }
             }
         })
@@ -82,10 +82,10 @@ struct ChatListChildView: View {
                             .font(.headline)
                         Spacer()
                         Text(chat.model?.rawValue ?? "")
+                            .padding(6)
                             .font(.caption2)
                             .fontWeight(.semibold)
                             .foregroundStyle(chat.model?.tintColor ?? .white)
-                            .padding(6)
                             .background((chat.model?.tintColor ?? .white).opacity(0.1))
                             .clipShape(Capsule(style: .continuous))
                         
