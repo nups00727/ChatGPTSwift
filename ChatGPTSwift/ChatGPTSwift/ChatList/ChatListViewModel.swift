@@ -13,7 +13,6 @@ import OpenAI
     
     var chats: [AppChat] = []
     var loadingState: ChatListState = .none
-    var isShowingProfileView: Bool = false
     private let db = Firestore.firestore()
     
     func fetchChats(user: String?) {
@@ -35,22 +34,17 @@ import OpenAI
         }
     }
     
-    func createChat(user: String?) async throws -> String {
+    func createChat(user: String?, topic: String = "New Chat") async throws -> String {
         let document = try await db.collection("chats").addDocument(data:
                                                                         ["lastMessageSentAt": Date(),
-                                                                         "owner": user ?? ""])
+                                                                         "owner": user ?? "",
+                                                                         "topic": topic])
         return document.documentID
-    }
-    
-    func showProfile() {
-        isShowingProfileView = true
     }
     
     func deleteChat(chat: AppChat) {
         guard let id = chat.id else { return }
-        
         db.collection("chats").document(id).delete()
-        
     }
 }
 
@@ -73,15 +67,14 @@ struct AppChat: Codable {
         let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: lastMessageSentAt.date, to: now)
         let timeUnits: [(value: Int?, unit: String)] = [
             (components.year, "year"),
-            (components.year, "month"),
-            (components.year, "day"),
-            (components.year, "hour"),
-            (components.year, "minute"),
-            (components.year, "second")
+            (components.month, "month"),
+            (components.day, "day"),
+            (components.hour, "hour"),
+            (components.minute, "minute"),
+            (components.second, "second")
         ]
         for unit in timeUnits {
             if let value = unit.value, value > 0 {
-                    
                 return "\(value) \(unit.unit)\(value == 1 ? "" : "s")"
             }
         }
@@ -92,13 +85,13 @@ struct AppChat: Codable {
 
 enum ChatModel: String, Codable, CaseIterable, Hashable {
     case chatGPT40 = "GPT 4o"
-    case chatGPT4 = "GPT 4"
+    case chatGPT4_1 = "GPT 4.1"
     
     var tintColor: Color {
         switch self {
         case .chatGPT40:
             return .green
-        case .chatGPT4:
+        case .chatGPT4_1:
             return .purple
         }
     }
@@ -107,7 +100,7 @@ enum ChatModel: String, Codable, CaseIterable, Hashable {
         switch self {
         case .chatGPT40:
             return .gpt4_o
-        case .chatGPT4:
+        case .chatGPT4_1:
             return .gpt4_1
         }
     }

@@ -13,14 +13,14 @@ class OpenAIService {
 
     func sendMessage(messages: [Message]) async throws -> OpenAIChatResponse? {
         let openAIChatMessages = messages.map({ OpenAIChatmessage(role: $0.role, content: $0.content) })
-        let openAIBody = OpenAIChatBody(model: "gpt-4o", messages: openAIChatMessages)
+        let openAIBody = OpenAIChatBody(model: "gpt4_1", messages: openAIChatMessages)
         
         var request = URLRequest(url: URL(string: endpoint)!)
         request.httpMethod = "POST"
         request.allHTTPHeaderFields = ["Authorization": "Bearer \(Secrets.apiKey)",
                                        "Content-Type": "application/json"]
         request.httpBody = try JSONEncoder().encode(openAIBody)
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: request)
         return try JSONDecoder().decode(OpenAIChatResponse.self, from: data)
     }
 }

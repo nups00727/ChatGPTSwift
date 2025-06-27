@@ -11,6 +11,10 @@ struct ChatListView: View {
     
     @State var viewModel = ChatListViewModel()
     @Environment(AppState.self) private var appState: AppState
+    @State var topic: String = ""
+    @State var showingAlert: Bool = false
+    @State var submit: () -> Void = {}
+    
     
     var body: some View {
         Group {
@@ -21,7 +25,7 @@ struct ChatListView: View {
                 Text("No results found")
             case .resultFound:
                 List {
-                        ChatListChildView(viewModel: viewModel)
+                    ChatListChildView(viewModel: viewModel)
                 }
             }
         }
@@ -29,28 +33,27 @@ struct ChatListView: View {
         .toolbar(content: {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    viewModel.showProfile()
-                } label: {
-                    Image(systemName: "person.crop.circle.fill")
-                }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    Task {
-                        do {
-                           let chatId = try await viewModel.createChat(user: appState.currentUser?.uid)
-                            appState.navigationPath.append(chatId)
-                        } catch {
-                            print(error)
-                        }
-                    }
+                    showingAlert = true
+                    topic = ""
                 } label: {
                     Image(systemName: "square.and.pencil")
                 }
+                .alert("", isPresented: $showingAlert) {
+                    TextField("Enter your topic of chat", text: $topic)
+                    Button("Create Chat", action: {
+                        showingAlert = false
+                        Task {
+                            do {
+                               let chatId = try await viewModel.createChat(user: appState.currentUser?.uid,
+                                                                           topic: topic)
+                                appState.navigationPath.append(chatId)
+                            } catch {
+                                print(error)
+                            }
+                        }
+                    })
+                }
             }
-        })
-        .sheet(isPresented: $viewModel.isShowingProfileView, content: {
-            ProfileView()
         })
         .navigationDestination(for: String.self, destination: { chatId in
             ChatView(viewModel: .init(chatID: chatId))
@@ -87,7 +90,7 @@ struct ChatListChildView: View {
                             .clipShape(Capsule(style: .continuous))
                         
                     }
-                    Text(chat.lastMessageTimeAgo)
+                    Text("\(chat.lastMessageTimeAgo)")
                         .font(.caption)
                         .foregroundStyle(.gray)
                 }

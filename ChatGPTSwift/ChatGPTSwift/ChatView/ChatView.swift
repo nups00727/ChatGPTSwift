@@ -14,21 +14,38 @@ struct ChatView: View {
     
     var body: some View {
         VStack {
-            chatSelection
-            ScrollViewReader { scrollView in
-                List(viewModel.messages.filter({$0.role != .system})) { message in
-                    messageView(message: message)
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
-                        .id(message.id)
-                        .onChange(of: viewModel.messages) { oldValue ,newValue in
-                            scrollToBotton(scrollView: scrollView)
-                        }
+            if viewModel.loadingState == .loading {
+                VStack {
+                    Spacer()
+                    ProgressView()
+                    Text("Loading chats...")
+                        .foregroundStyle(.gray.opacity(0.7))
+                    Spacer()
                 }
-                .background(Color(uiColor: .systemGroupedBackground))
-                .listStyle(.plain)
+            } else {
+                chatSelection
+                ScrollViewReader { scrollView in
+                    List(viewModel.messages.filter({$0.role != .system})) { message in
+                        messageView(message: message)
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                            .id(message.id)
+                            .onAppear(){
+                                withAnimation {
+                                    scrollToBottom(scrollView: scrollView,
+                                                   id: lastMessageId(id: message.id))
+                                }
+                            }
+                            .onChange(of: viewModel.messages) { _, _ in
+                                scrollToBottom(scrollView: scrollView,
+                                               id: lastMessageId(id: message.id))
+                            }
+                    }
+                    .background(Color(uiColor: .systemGroupedBackground))
+                    .listStyle(.plain)
+                }
+                messageInputView
             }
-            messageInputView
         }
         .navigationTitle(viewModel.chat?.topic ?? "New Chat")
         .navigationBarTitleDisplayMode(.inline)
@@ -37,9 +54,17 @@ struct ChatView: View {
         }
     }
     
-    private func scrollToBotton(scrollView: ScrollViewProxy) {
-        guard !viewModel.messages.isEmpty, let lastMsg = viewModel.messages.last else {return}
-        scrollView.scrollTo(lastMsg.id)
+    private func lastMessageId(id: String?) -> String {
+        if let lastMessage = viewModel.messages.last,
+           lastMessage.id == id {
+            return id ?? "0"
+        }
+        return "0"
+    }
+    
+    @MainActor
+    private func scrollToBottom(scrollView: ScrollViewProxy, id: String) {
+        scrollView.scrollTo(id, anchor: .bottom)
     }
     
     @ViewBuilder
@@ -47,6 +72,11 @@ struct ChatView: View {
         Group {
             if let model = viewModel.chat?.model?.rawValue {
                 Text(model)
+                    .padding(.horizontal, 15)
+                    .foregroundStyle(.purple)
+                    .background(Color(uiColor: .systemGroupedBackground))
+                    .frame(height: 40)
+                    .cornerRadius(12)
             } else {
                 Picker(selection: $viewModel.selectedChatModel) {
                     ForEach(ChatModel.allCases, id: \.self) { model in
@@ -98,7 +128,8 @@ struct ChatView: View {
                     .cornerRadius(12)
             }
         }
-        .padding()
+        .padding(.vertical, 10)
+        .padding(.horizontal)
     }
     
     private func sendMessage() {

@@ -13,9 +13,10 @@ import OpenAI
     var messages: [Message] = []//[Message(timestamp: Date(), id: "1",
                                        //content: "You are psycology assistant and you do not have any knowledge about anything", role: .system)]
     var currentInput: String = ""
+    var loadingState: ChatListState = .loading
     private let service = OpenAIService()
     let chatID: String
-    var selectedChatModel: ChatModel = ChatModel.chatGPT4
+    var selectedChatModel: ChatModel = ChatModel.chatGPT4_1
     private let db = Firestore.firestore()
     
     init(chatID: String) {
@@ -28,14 +29,18 @@ import OpenAI
             switch result {
             case .success(let appChat):
                 DispatchQueue.main.async {
+                    self?.loadingState = .resultFound
                     self?.chat = appChat
                 }
             case .failure(let error):
                 print(error)
+                self?.loadingState = .resultFound
             }
         }
         
-        db.collection("chats").document(chatID).collection("messages").getDocuments { snapshot, error in
+        db.collection("chats").document(chatID).collection("messages")
+            .order(by: "createdAt", descending: false).getDocuments { snapshot, error in
+                
             guard let documents = snapshot?.documents, !documents.isEmpty else {return}
            
             self.messages = documents.compactMap({ msg -> Message? in
@@ -47,9 +52,6 @@ import OpenAI
                        return nil
                     }
                 })
-                //.sorted(by: {$0.lastMessageSentAt > $1.lastMessageSentAt})
-            print(self.messages.map({$0.content}))
-
         }
     }
     
@@ -101,10 +103,7 @@ import OpenAI
 //                    do {
 //                        let receivedMsgResponse = try await service.sendMessage(messages: messages)
 //                        guard let receivedMsg = receivedMsgResponse?.choices.first?.message else { return print("No 1st message received") }
-//                        let receivedMsg2 = Message(timestamp: Date(), id: "", content: receivedMsg.content, role: receivedMsg.role)
-//                        await MainActor.run {
-//                            messages.append(receivedMsg2)
-//                        }
+//                       
 //        
 //                    } catch (let error) {
 //                        print("No message received \(error)")

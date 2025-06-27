@@ -25,10 +25,3 @@ struct OpenAIChatmessage: Codable {
     let role: ChatQuery.ChatCompletionMessageParam.Role
     let content: String
 }
-
-//enum SenderRole: String, Codable {
-//    //case developer
-//    case user
-//    case assistant
-//    case system
-//}
